@@ -1,9 +1,22 @@
 FROM alpine:latest
 
+ARG TARGETARCH
+
 # Supercronic setup variables
 ARG SUPERCRONIC_VERSION=v0.2.33
-ARG SUPERCRONIC_ARCH=linux-arm64
-ARG SUPERCRONIC_SHA1SUM=e0f0c06ebc5627e43b25475711e694450489ab00
+
+RUN case "${TARGETARCH}" in \
+        "arm64") \
+            SUPERCRONIC_ARCH="linux-arm64" && \
+            SUPERCRONIC_SHA1SUM="e0f0c06ebc5627e43b25475711e694450489ab00" ;; \
+        "amd64") \
+            SUPERCRONIC_ARCH="linux-amd64" && \
+            SUPERCRONIC_SHA1SUM="71b0d58cc53f6bd72cf2f293e09e294b79c666d8" ;; \
+        *) \
+            echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac && \
+    echo "Using architecture: ${SUPERCRONIC_ARCH}"
+
 ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/${SUPERCRONIC_VERSION}/supercronic-${SUPERCRONIC_ARCH} \
     SUPERCRONIC=/usr/local/bin/supercronic
 
