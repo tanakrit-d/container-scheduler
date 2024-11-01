@@ -19,10 +19,10 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 
 ## To-do
 
-[ ] Provide configuration for schedules  
-[ ] Ensure workflow only runs on version releases  
-[ ] Multi-stage build for smaller images  
-[ ] Fix (harmless) errors which appear in the logs during initial container run  
+- [ ] Provide configuration for schedules  
+- [ ] Ensure workflow only runs on version releases  
+- [ ] Multi-stage build for smaller images  
+- [ ] Fix (harmless) errors which appear in the logs during initial container run  
 
 ## Quick Start
 
@@ -124,10 +124,6 @@ This container:
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
