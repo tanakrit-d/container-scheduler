@@ -1,0 +1,18 @@
+services:
+  docker-scheduler:
+    image: alpine:latest
+    container_name: docker-scheduler
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /data/app_data/docker-scheduler:/app
+      - /data/app_data/docker-scheduler/logs:/var/log
+      - /data/app_data/docker-scheduler/runtime:/runtime
+    environment:
+      - TZ=Australia/Melbourne
+    user: "root"
+    security_opt:
+      - no-new-privileges:true
+    entrypoint: ["/bin/sh", "/app/entrypoint.sh"]
