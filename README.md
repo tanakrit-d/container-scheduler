@@ -20,7 +20,7 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 ## To-do
 
 - [ ] Provide configuration for schedules  
-- [ ] Ensure workflow only runs on version releases  
+- [x] Ensure workflow only runs on version releases  
 - [ ] Multi-stage build for smaller images  
 - [ ] Fix (harmless) errors which appear in the logs during initial container run  
 
@@ -101,7 +101,10 @@ services:
 2. Build the image:
 
     ```bash
-    docker build -t container-scheduler .
+    #linux/amd64
+    docker build --build-arg TARGETARCH=amd64 -t container-scheduler .
+    #linux/arm64
+    docker build --build-arg TARGETARCH=arm64 -t container-scheduler .
     ```
 
 ## Log Files
