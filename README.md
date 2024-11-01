@@ -14,9 +14,15 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 
 ## Host Architecture
 
-- arm64  
-  Currently the arm64 version of supercronic is hardcoded into the `Dockerfile`  
-  In the next version there will be seperate builds for different architectures :^)
+- linux/amd64  
+- linux/arm46  
+
+## To-do
+
+[ ] Provide configuration for schedules  
+[ ] Ensure workflow only runs on version releases  
+[ ] Multi-stage build for smaller images  
+[ ] Fix (harmless) errors which appear in the logs during initial container run  
 
 ## Quick Start
 
