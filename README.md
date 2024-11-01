@@ -12,6 +12,12 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 - Secure by default with no-new-privileges
 - Timezone support
 
+## Host Architecture
+
+- arm64  
+  Currently the arm64 version of supercronic is hardcoded into the `Dockerfile`  
+  In the next version there will be seperate builds for different architectures :^)
+
 ## Quick Start
 
 ```bash
