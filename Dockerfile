@@ -17,6 +17,7 @@ FROM alpine:latest
 ARG TARGETARCH
 ARG SUPERCRONIC_VERSION=v0.2.33
 ENV SUPERCRONIC=/usr/local/bin/supercronic
+ENV SUPERCRONIC_OPTIONS="-json -quiet"
 
 LABEL org.opencontainers.image.title="Scheduler Container" \
     org.opencontainers.image.version=${SUPERCRONIC_VERSION} \
@@ -27,12 +28,14 @@ RUN addgroup -g 1000 scheduler && \
     adduser -u 1000 -G scheduler -h /home/scheduler -D scheduler
 
 RUN apk add --no-cache \
-    bash=~5.2 \
-    curl=~8.4 \
-    tzdata=~2024 \
-    docker-cli=~24.0 \
-    ca-certificates=~20230506 \
-    su-exec=~0.2
+    bash \
+    curl \
+    tzdata \
+    docker-cli \
+    ca-certificates \
+    su-exec \
+    procps \
+    jq
 
 RUN mkdir -p /app /runtime /var/log && \
     chown -R scheduler:scheduler /runtime /var/log && \
@@ -47,33 +50,30 @@ RUN chmod +x /app/functions.sh && \
     cp /app/functions.sh /runtime/ && \
     chown -R scheduler:scheduler /app
 
-RUN <<EOF cat > /entrypoint.sh
+RUN cat <<'EOF' > /entrypoint.sh
 #!/bin/sh
 set -euo pipefail
 
-# Get Docker GID from socket and add scheduler to docker group
 if [ -e /var/run/docker.sock ]; then
-    DOCKER_GID=\$(stat -c "%g" /var/run/docker.sock)
-    addgroup -g "\${DOCKER_GID}" docker
-    adduser scheduler docker
+    DOCKER_GID=$(stat -c "%g" /var/run/docker.sock)
+    addgroup -g "${DOCKER_GID}" docker || true
+    addgroup scheduler docker
 fi
 
-# Verify supercronic is executable
-if ! [ -x "\${SUPERCRONIC}" ]; then
-    echo "Error: \${SUPERCRONIC} is not executable"
+if ! [ -x "$SUPERCRONIC" ]; then
+    echo "Error: $SUPERCRONIC is not executable"
     exit 1
 fi
 
-# Execute supercronic as scheduler user
-exec su-exec scheduler \${SUPERCRONIC} -debug /app/container-schedules.cron
+exec su-exec scheduler "$SUPERCRONIC" $SUPERCRONIC_OPTIONS /app/container-schedules.cron
 EOF
+
 RUN chmod +x /entrypoint.sh
 
 WORKDIR /app
-VOLUME ["/var/log", "/runtime"]
+VOLUME ["/var/log"]
 
-HEALTHCHECK --interval=5m --timeout=3s \
-    CMD pgrep supercronic || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD ps aux | grep supercronic | grep -v grep > /dev/null || exit 1
 
-USER scheduler
 ENTRYPOINT ["/entrypoint.sh"]
