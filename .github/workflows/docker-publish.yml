@@ -109,6 +109,6 @@ jobs:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
           echo "${TAGS}" | xargs -I {} cosign verify \
-            --certificate-identity "https://github.com/${{ github.repository_owner }}/${{ github.repository }}/.github/workflows/docker-publish.yml@refs/tags/v*.*.*" \
+            --certificate-identity "https://github.com/tanakrit-d/container-scheduler/.github/workflows/docker-publish.yml@refs/tags/v*" \
             --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
             {}@${DIGEST}
