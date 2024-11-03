@@ -1,4 +1,4 @@
-name: Docker Multi-Architecture Build
+name: Docker Release Build
 
 on:
   push:
