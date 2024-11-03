@@ -34,7 +34,7 @@ docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e TZ=Australia/Melbourne \
   --security-opt no-new-privileges=true \
-  ghcr.io/Tanakrit-D/container-scheduler:latest
+  ghcr.io/tanakrit-d/container-scheduler:latest
 ```
 
 ## Using Docker Compose
@@ -42,7 +42,7 @@ docker run -d \
 ```yaml
 services:
   container-scheduler:
-    image: ghcr.io/Tanakrit-D/container-scheduler:latest
+    image: ghcr.io/tanakrit-d/container-scheduler:latest
     container_name: container-scheduler
     restart: unless-stopped
     volumes:
@@ -91,7 +91,7 @@ services:
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/Tanakrit-D/container-scheduler.git
+    git clone https://github.com/tanakrit-d/container-scheduler.git
     cd container-scheduler
     ```
 
