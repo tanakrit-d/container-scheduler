@@ -19,10 +19,12 @@ ARG SUPERCRONIC_VERSION=v0.2.33
 ENV SUPERCRONIC=/usr/local/bin/supercronic
 ENV SUPERCRONIC_OPTIONS="-json -quiet"
 
-LABEL org.opencontainers.image.title="Scheduler Container" \
-    org.opencontainers.image.version=${SUPERCRONIC_VERSION} \
-    org.opencontainers.image.description="Scheduling container using supercronic" \
-    org.opencontainers.image.source="https://github.com/aptible/supercronic"
+LABEL org.opencontainers.image.annotations='{ \
+    "org.opencontainers.image.title": "Scheduler Container", \
+    "org.opencontainers.image.description": "Scheduling container using supercronic", \
+    "org.opencontainers.image.source": "https://github.com/tanakrit-d/container-scheduler", \
+    "io.container.scheduler.arch": "'${TARGETARCH}'" \
+    }'
 
 RUN addgroup -g 1000 scheduler && \
     adduser -u 1000 -G scheduler -h /home/scheduler -D scheduler

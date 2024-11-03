@@ -55,15 +55,21 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=ref,event=tag,suffix=-amd64,platform=linux/amd64
+            type=ref,event=tag,suffix=-arm64,platform=linux/arm64
+            type=raw,value=latest-amd64,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }},platform=linux/amd64
+            type=raw,value=latest-arm64,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }},platform=linux/arm64
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
-          labels: |
+          annotations: |
             org.opencontainers.image.title=${IMAGE_NAME}
             org.opencontainers.image.description=Multi-architecture Docker image
             org.opencontainers.image.vendor=${{ github.repository_owner }}
             maintainer=${{ github.repository_owner }}
+            com.github.repo=${{ github.repository }}
+            com.github.sha=${{ github.sha }}
+            com.github.ref=${{ github.ref }}
+            com.github.workflow=${{ github.workflow }}
 
       - name: Verify build configuration
         run: |
@@ -78,7 +84,7 @@ jobs:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          annotations: ${{ steps.meta.outputs.annotations }}
           platforms: ${{ env.PLATFORMS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
