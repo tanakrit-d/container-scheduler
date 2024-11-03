@@ -10,5 +10,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # Weekly restarts
 0 0 * * 0 source /runtime/functions.sh && restart_containers "weekly" >> /var/log/cron.log 2>&1
 
+# Monthly restarts
+0 0 1 * * source /runtime/functions.sh && restart_containers "monthly" >> /var/log/cron.log 2>&1
+
 # Log rotation - keep last 7 days
 0 0 * * * find /var/log -name "cron.log*" -mtime +7 -delete

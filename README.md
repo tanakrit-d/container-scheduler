@@ -62,7 +62,7 @@ services:
   my-service:
     image: my-service-image
     labels:
-      - "restart-group=hourly"  # Options: hourly, daily, weekly
+      - "restart-group=hourly"  # Options: hourly, daily, weekly, monthly
 ```
 
 ### Available Schedule Groups
@@ -70,6 +70,7 @@ services:
 - `hourly`: Restarts every hour at minute 0
 - `daily`: Restarts daily at midnight
 - `weekly`: Restarts weekly on Sunday at midnight
+- `monthly`: Restarts monthly on first day at midnight
 
 ## Configuration
 
