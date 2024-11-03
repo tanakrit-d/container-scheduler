@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1.4
-
 FROM alpine:latest AS base
 ARG SUPERCRONIC_VERSION=v0.2.33
 ARG TARGETARCH
@@ -26,23 +24,19 @@ ENV SUPERCRONIC=/usr/local/bin/supercronic \
     TZ=UTC
 
 RUN addgroup -g 1000 scheduler && \
-    adduser -u 1000 -G scheduler -h /home/scheduler -D scheduler
-
-RUN apk add --no-cache \
+    adduser -u 1000 -G scheduler -h /home/scheduler -D scheduler && \
+    apk add --no-cache \
     bash \
-    curl \
     tzdata \
-    docker-cli \
-    ca-certificates \
+    curl \
+    jq \
     su-exec \
-    procps \
-    jq && \
-    rm -rf /var/cache/apk/*
-
-RUN mkdir -p /app /runtime /var/log && \
+    procps && \
+    mkdir -p /app /runtime /var/log && \
     chown -R scheduler:scheduler /runtime /var/log && \
     touch /var/log/cron.log && \
-    chown scheduler:scheduler /var/log/cron.log
+    chown scheduler:scheduler /var/log/cron.log && \
+    rm -rf /var/cache/apk/*
 
 COPY --from=base /tmp/supercronic ${SUPERCRONIC}
 RUN chmod +x ${SUPERCRONIC}
