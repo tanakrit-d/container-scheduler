@@ -23,6 +23,7 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 - [x] Ensure workflow only runs on version releases  
 - [x] Multi-stage build for smaller images  
 - [x] Fix (harmless) errors which appear in the logs during initial container run  
+- [ ] Change from restart to stop-start  
 - [ ] Add webhook functionality for notifications  
 
 ## Quick Start

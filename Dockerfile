@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 
-FROM alpine:latest AS verify
+FROM alpine:latest AS base
 ARG SUPERCRONIC_VERSION=v0.2.33
 ARG TARGETARCH
 
@@ -42,12 +42,12 @@ RUN mkdir -p /app /runtime /var/log && \
     touch /var/log/cron.log && \
     chown scheduler:scheduler /var/log/cron.log
 
-COPY --from=verify /tmp/supercronic ${SUPERCRONIC}
+COPY --from=base /tmp/supercronic ${SUPERCRONIC}
 RUN chmod +x ${SUPERCRONIC}
 
 COPY --chown=scheduler:scheduler functions.sh container-schedules.cron /app/
 RUN chmod +x /app/functions.sh && \
-    cp /app/functions.sh /runtime/ && \
+    mv /app/functions.sh /runtime/ && \
     chown -R scheduler:scheduler /app
 
 RUN cat <<'EOF' > /entrypoint.sh
