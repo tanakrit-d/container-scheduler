@@ -108,7 +108,12 @@ jobs:
           TAGS: ${{ steps.meta.outputs.tags }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         run: |
-          echo "${TAGS}" | xargs -I {} cosign verify \
-            --certificate-identity "https://github.com/tanakrit-d/container-scheduler/.github/workflows/docker-publish.yml@refs/tags/v*" \
-            --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
-            {}@${DIGEST}
+          while IFS= read -r tag; do
+            if [ ! -z "$tag" ]; then
+              echo "Verifying signature for $tag"
+              cosign verify \
+                --certificate-identity "https://github.com/${{ github.repository_owner }}" \
+                --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+                "$tag@${DIGEST}"
+            fi
+          done <<< "${TAGS}"
