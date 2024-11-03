@@ -17,12 +17,14 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 - linux/amd64  
 - linux/arm46  
 
-## To-do
+## To-do / Roadmap
 
 - [ ] Provide configuration for schedules  
 - [x] Ensure workflow only runs on version releases  
-- [ ] Multi-stage build for smaller images  
-- [ ] Fix (harmless) errors which appear in the logs during initial container run  
+- [x] Multi-stage build for smaller images  
+- [x] Fix (harmless) errors which appear in the logs during initial container run  
+- [ ] Change from restart to stop-start  
+- [ ] Add webhook functionality for notifications  
 
 ## Quick Start
 
@@ -30,8 +32,6 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 docker run -d \
   --name container-scheduler \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /path/to/logs:/var/log \
-  -v /path/to/runtime:/runtime \
   -e TZ=Australia/Melbourne \
   --security-opt no-new-privileges=true \
   ghcr.io/Tanakrit-D/container-scheduler:latest
@@ -47,8 +47,6 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /path/to/logs:/var/log
-      - /path/to/runtime:/runtime
     environment:
       - TZ=Australia/Melbourne
     security_opt:
@@ -57,7 +55,7 @@ services:
 
 ## Scheduling Container Restarts
 
-To schedule a container for automatic restarts, add a label to your container definition:
+To schedule a container for automatic restarts, simply add a label to your container definition:
 
 ```yaml
 services:
@@ -86,8 +84,7 @@ services:
 | Path | Description | Required |
 |------|-------------|----------|
 | `/var/run/docker.sock` | Docker socket for container management | Yes |
-| `/var/log` | Log directory | Yes |
-| `/runtime` | Runtime files directory | Yes |
+| `/var/log` | Log directory | No |
 
 ## Building from Source
 
@@ -126,7 +123,7 @@ This container:
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions or feedback is welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
