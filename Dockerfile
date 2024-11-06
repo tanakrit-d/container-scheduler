@@ -11,9 +11,11 @@ RUN case "${TARGETARCH}" in \
     "arm64") SUPERCRONIC_ARCH="${SUPERCRONIC_ARCH_ARM64}"; SUPERCRONIC_SHA1SUM="${SUPERCRONIC_SHA1_ARM64}" ;; \
     "amd64") SUPERCRONIC_ARCH="${SUPERCRONIC_ARCH_AMD64}"; SUPERCRONIC_SHA1SUM="${SUPERCRONIC_SHA1_AMD64}" ;; \
     *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
-    esac && \
-    wget -O /tmp/supercronic "https://github.com/aptible/supercronic/releases/download/${SUPERCRONIC_VERSION}/supercronic-${SUPERCRONIC_ARCH}" && \
-    echo "${SUPERCRONIC_SHA1SUM}  /tmp/supercronic" | sha1sum -c - && \
+    esac
+
+COPY wget -O /tmp/supercronic "https://github.com/aptible/supercronic/releases/download/${SUPERCRONIC_VERSION}/supercronic-${SUPERCRONIC_ARCH}"
+
+RUN echo "${SUPERCRONIC_SHA1SUM}  /tmp/supercronic" | sha1sum -c - && \
     chmod +x /tmp/supercronic
 
 FROM alpine:latest
@@ -27,11 +29,11 @@ RUN addgroup -g 1000 scheduler && \
     adduser -u 1000 -G scheduler -h /home/scheduler -D scheduler && \
     apk add --no-cache \
     bash \
-    tzdata \
     curl \
     jq \
+    procps \
     su-exec \
-    procps && \
+    tzdata && \
     mkdir -p /app /runtime /var/log && \
     chown -R scheduler:scheduler /runtime /var/log && \
     touch /var/log/cron.log && \
@@ -44,25 +46,23 @@ RUN chmod +x ${SUPERCRONIC}
 COPY --chown=scheduler:scheduler functions.sh container-schedules.cron /app/
 RUN chmod +x /app/functions.sh && \
     mv /app/functions.sh /runtime/ && \
-    chown -R scheduler:scheduler /app
+    chown -R scheduler:scheduler /app && \
+    cat <<'EOF' > /entrypoint.sh
+    #!/bin/sh
+    set -euo pipefail
 
-RUN cat <<'EOF' > /entrypoint.sh
-#!/bin/sh
-set -euo pipefail
+    if [ -e /var/run/docker.sock ]; then
+        DOCKER_GID=$(stat -c "%g" /var/run/docker.sock)
+        addgroup -g "${DOCKER_GID}" docker || true
+        addgroup scheduler docker
+    fi
 
-if [ -e /var/run/docker.sock ]; then
-    DOCKER_GID=$(stat -c "%g" /var/run/docker.sock)
-    addgroup -g "${DOCKER_GID}" docker || true
-    addgroup scheduler docker
-fi
-
-if ! [ -x "$SUPERCRONIC" ]; then
-    echo "Error: $SUPERCRONIC is not executable"
-    exit 1
-fi
-
-exec su-exec scheduler "$SUPERCRONIC" $SUPERCRONIC_OPTIONS /app/container-schedules.cron
-EOF
+    if ! [ -x "$SUPERCRONIC" ]; then
+        echo "Error: $SUPERCRONIC is not executable"
+        exit 1
+    fi
+    exec su-exec scheduler "$SUPERCRONIC" $SUPERCRONIC_OPTIONS /app/container-schedules.cron
+    EOF
 
 RUN chmod +x /entrypoint.sh
 
