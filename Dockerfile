@@ -46,21 +46,21 @@ RUN chmod +x ${SUPERCRONIC}
 COPY --chown=scheduler:scheduler functions.sh container-schedules.cron /app/
 RUN chmod +x /app/functions.sh && \
     mv /app/functions.sh /runtime/ && \
-    chown -R scheduler:scheduler /app && \
-    cat <<'EOF' > /entrypoint.sh
-    #!/bin/sh
-    set -euo pipefail
+    chown -R scheduler:scheduler /app
+RUN cat <<'EOF' > /entrypoint.sh
+#!/bin/sh
+set -euo pipefail
 
-    if [ -e /var/run/docker.sock ]; then
-    addgroup scheduler docker
-    fi
+if [ -e /var/run/docker.sock ]; then
+addgroup scheduler docker
+fi
 
-    if ! [ -x "$SUPERCRONIC" ]; then
-        echo "Error: $SUPERCRONIC is not executable"
-        exit 1
-    fi
-    exec su-exec scheduler "$SUPERCRONIC" $SUPERCRONIC_OPTIONS /app/container-schedules.cron
-    EOF
+if ! [ -x "$SUPERCRONIC" ]; then
+    echo "Error: $SUPERCRONIC is not executable"
+    exit 1
+fi
+exec su-exec scheduler "$SUPERCRONIC" "$SUPERCRONIC_OPTIONS" /app/container-schedules.cron
+EOF
 
 RUN chmod +x /entrypoint.sh
 
@@ -73,6 +73,6 @@ WORKDIR /app
 VOLUME ["/var/log"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ps aux | grep supercronic | grep -v grep > /dev/null || exit 1
+    CMD ["sh", "-c", "ps aux | grep supercronic | grep -v grep > /dev/null || exit 1"]
 
 ENTRYPOINT ["/entrypoint.sh"]
