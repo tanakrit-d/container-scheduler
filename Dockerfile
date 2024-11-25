@@ -52,9 +52,7 @@ RUN chmod +x /app/functions.sh && \
     set -euo pipefail
 
     if [ -e /var/run/docker.sock ]; then
-        DOCKER_GID=$(stat -c "%g" /var/run/docker.sock)
-        addgroup -g "${DOCKER_GID}" docker || true
-        addgroup scheduler docker
+    addgroup scheduler docker
     fi
 
     if ! [ -x "$SUPERCRONIC" ]; then
