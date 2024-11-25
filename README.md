@@ -6,6 +6,7 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 
 - Schedule container restarts using Docker labels
 - Support for hourly, daily, and weekly restart schedules
+- Use API calls instead of Docker CLI for reduced image size
 - Automatic log rotation
 - Minimal Alpine-based image
 - Runs as non-root user
@@ -47,6 +48,7 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /path/to/your/logs:/var/log
     environment:
       - TZ=Australia/Melbourne
     security_opt:
@@ -62,7 +64,7 @@ services:
   my-service:
     image: my-service-image
     labels:
-      - "restart-group=hourly"  # Options: hourly, daily, weekly
+      - "restart-group=hourly"  # Options: hourly, daily, weekly, monthly
 ```
 
 ### Available Schedule Groups
@@ -70,6 +72,7 @@ services:
 - `hourly`: Restarts every hour at minute 0
 - `daily`: Restarts daily at midnight
 - `weekly`: Restarts weekly on Sunday at midnight
+- `monthly`: Restarts monthly on first day at midnight
 
 ## Configuration
 
