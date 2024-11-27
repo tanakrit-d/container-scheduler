@@ -22,8 +22,10 @@ A lightweight Docker container that automates the scheduling of Docker container
 - [x] Multi-stage build for smaller images
 - [ ] Provide configuration for schedules
 - [ ] Migrate to non-root user
-  - [ ] Add [apline/socat](https://forums.docker.com/t/mounting-using-var-run-docker-sock-in-a-container-not-running-as-root/34390/8)
-  - [ ] Update docker-compose example to utilise this
+  - [ ] Linux implementation
+  - [ ] MacOS implementation
+    - [ ] Add [apline/socat](https://forums.docker.com/t/mounting-using-var-run-docker-sock-in-a-container-not-running-as-root/34390/8)
+    - [ ] Update docker-compose example to utilise this
 - [ ] Implement no-new-privileges
 - [ ] Change from restart to stop-start
 - [ ] Add webhook functionality for notifications
