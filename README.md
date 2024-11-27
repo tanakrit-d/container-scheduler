@@ -1,6 +1,6 @@
 # Docker Container Scheduler
 
-A lightweight, secure Docker container that automates the scheduling of Docker container restarts based on labels. Built on Alpine Linux and uses [supercronic](https://github.com/aptible/supercronic) for reliable cron job execution.
+A lightweight Docker container that automates the scheduling of Docker container restarts based on labels. Built on Alpine Linux and uses [supercronic](https://github.com/aptible/supercronic) for reliable cron job execution.
 
 ## Features
 
@@ -9,8 +9,6 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 - Use API calls instead of Docker CLI for reduced image size
 - Automatic log rotation
 - Minimal Alpine-based image
-- Runs as non-root user
-- Secure by default with no-new-privileges
 - Timezone support
 
 ## Host Architecture
@@ -20,12 +18,13 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 
 ## To-do / Roadmap
 
-- [ ] Provide configuration for schedules  
-- [x] Ensure workflow only runs on version releases  
-- [x] Multi-stage build for smaller images  
-- [x] Fix (harmless) errors which appear in the logs during initial container run  
-- [ ] Change from restart to stop-start  
-- [ ] Add webhook functionality for notifications  
+- [x] Ensure workflow only runs on version releases
+- [x] Multi-stage build for smaller images
+- [ ] Provide configuration for schedules
+- [ ] Migrate to non-root user
+- [ ] Implement no-new-privileges
+- [ ] Change from restart to stop-start
+- [ ] Add webhook functionality for notifications
 
 ## Quick Start
 
@@ -34,7 +33,6 @@ docker run -d \
   --name container-scheduler \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -e TZ=Australia/Melbourne \
-  --security-opt no-new-privileges=true \
   ghcr.io/tanakrit-d/container-scheduler:latest
 ```
 
@@ -51,8 +49,6 @@ services:
       - /path/to/your/logs:/var/log
     environment:
       - TZ=Australia/Melbourne
-    security_opt:
-      - no-new-privileges:true
 ```
 
 ## Scheduling Container Restarts
@@ -117,12 +113,8 @@ docker logs container-scheduler
 
 ## Security Considerations
 
-This container:
-
-- Runs as a non-root user
-- Uses no-new-privileges security option
-- Requires minimal permissions through Docker socket
-- Handles Docker socket GID mapping automatically
+I would like to migrate this container to a non-root user, but I have not yet been able to identify an easy way to access docker.sock with either the CLI or API calls.  
+If you have any advice please let me know as I would love to increase the security of this container.
 
 ## Contributing
 

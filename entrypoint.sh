@@ -3,10 +3,7 @@
 set -euo pipefail
 
 if [ -e /var/run/docker.sock ]; then
-    if ! getent group docker >/dev/null; then
-        echo "Error: docker group does not exist. Please create it with 'groupadd docker' before running this script."
-        exit 1
-    fi
+    echo "Info: docker socket exists. Ensure your container has the correct permissions to access it."
 fi
 
 if [ ! -x /usr/local/bin/supercronic ]; then
@@ -21,4 +18,4 @@ if [ ! -f "$CRON_FILE" ]; then
     exit 1
 fi
 
-exec su-exec scheduler /usr/local/bin/supercronic -json -quiet "$CRON_FILE"
+exec /usr/local/bin/supercronic -json -quiet "$CRON_FILE"

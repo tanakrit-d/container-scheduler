@@ -36,25 +36,17 @@ RUN apk add --no-cache \
         jq \
         micro \
         procps \
-        su-exec \
         tzdata && \
-    addgroup -g 1000 docker && \
-    addgroup -g 1001 scheduler && \
-    adduser -u 1000 -G scheduler -h /home/scheduler -D scheduler && \
-    adduser scheduler docker && \
     mkdir -p /app /var/log && \
-    chown -R scheduler:scheduler /var/log && \
     touch /var/log/cron.log && \
-    chown scheduler:scheduler /var/log/cron.log && \
     rm -rf /var/cache/apk/*
 
 COPY --from=base /usr/local/bin/supercronic /usr/local/bin/supercronic
-COPY --chown=scheduler:scheduler functions.sh container-schedules.cron entrypoint.sh /app/
+COPY functions.sh container-schedules.cron entrypoint.sh /app/
 
 RUN chmod +x /app/entrypoint.sh && \
     chmod +x /app/functions.sh && \
-    chmod +x /usr/local/bin/supercronic && \
-    chown -R scheduler:scheduler /app
+    chmod +x /usr/local/bin/supercronic
 
 LABEL org.opencontainers.image.title="Scheduler Container" \
     org.opencontainers.image.description="Scheduling container using supercronic" \
