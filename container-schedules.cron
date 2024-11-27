@@ -13,5 +13,5 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # Monthly restarts
 0 0 1 * * /bin/bash -c 'source /app/functions.sh && restart_containers "monthly"' >> /var/log/cron.log 2>&1
 
-# Log rotation - keep last 7 days
-0 0 * * * find /var/log -name "cron.log*" -mtime +7 -delete
+# Log rotation - keep last 28 days
+0 0 * * * find /var/log -name "cron.log*" -mtime +28 -delete
