@@ -4,6 +4,8 @@ set -euo pipefail
 
 if [ -e /var/run/docker.sock ]; then
     echo "Info: docker socket exists. Ensure your container has the correct permissions to access it."
+    echo "If the host is MacOS you will need to implement forwarding."
+    echo "See https://forums.docker.com/t/mounting-using-var-run-docker-sock-in-a-container-not-running-as-root/34390/8"
 fi
 
 if [ ! -x /usr/local/bin/supercronic ]; then
