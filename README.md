@@ -114,7 +114,7 @@ services:
 
 ## Log Files
 
-Logs are written to `/var/log/cron.log` and are automatically rotated every 7 days. You can access the logs by mounting the `/var/log` directory or by using `docker logs`:
+Logs are written to `/var/log/cron.log` and are automatically rotated every 28 days. You can access the logs by mounting the `/var/log` directory or by using `docker logs`:
 
 ```bash
 docker logs container-scheduler
