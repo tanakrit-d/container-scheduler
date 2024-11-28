@@ -15,21 +15,21 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 
 ## Host Architecture
 
-- linux/amd64  
-- linux/arm46  
+- [x] linux/amd64
+- [x] linux/arm64
+- [ ] macos/arm64
 
 ## To-do / Roadmap
 
 - [x] Ensure workflow only runs on version releases
 - [x] Multi-stage build for smaller images
-- [x] Migrate to non-root user
-  - [x] Linux implementation
-  - [ ] MacOS implementation
-    - [ ] Add [apline/socat](https://forums.docker.com/t/mounting-using-var-run-docker-sock-in-a-container-not-running-as-root/34390/8)
-    - [ ] Update docker-compose example to utilise this
+- [x] Script execution as non-root user
+  - [x] Verify Linux
+  - [ ] Verify MacOS
+    - [ ] Requires [alpine/socat](https://forums.docker.com/t/mounting-using-var-run-docker-sock-in-a-container-not-running-as-root/34390/8)
 - [x] Implement no-new-privileges
+- [x] Change from restart to stop-start
 - [ ] Provide configuration for schedules
-- [ ] Change from restart to stop-start
 - [ ] Add webhook functionality for notifications
 
 ## Quick Start
@@ -38,12 +38,17 @@ A lightweight, secure Docker container that automates the scheduling of Docker c
 docker run -d \
   --name container-scheduler \
   -v /var/run/docker.sock:/var/run/docker.sock \
+  -e HOST_DOCKER_GID=your-gid-here \
   -e TZ=Australia/Melbourne \
   --security-opt no-new-privileges=true \
   ghcr.io/tanakrit-d/container-scheduler:latest
 ```
 
+Note: You can get your docker GID with `getent group docker | cut -d: -f3`
+
 ## Using Docker Compose
+
+Linux:
 
 ```yaml
 services:
@@ -55,6 +60,34 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /path/to/your/logs:/var/log
     environment:
+      - HOST_DOCKER_GID=your-gid-here
+      - TZ=Australia/Melbourne
+    security_opt:
+      - no-new-privileges:true
+```
+
+MacOS (untested):
+
+```yaml
+  socat:
+    image: alpine/socat
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    user: root
+    volumes:
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+
+  container-scheduler:
+    image: ghcr.io/tanakrit-d/container-scheduler:latest
+    container_name: container-scheduler
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /path/to/your/logs:/var/log
+    environment:
+      - DOCKER_HOST=localhost:2375
+      - HOST_DOCKER_GID=your-gid-here
       - TZ=Australia/Melbourne
     security_opt:
       - no-new-privileges:true
@@ -85,6 +118,7 @@ services:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| HOST_DOCKER_GID | Docker Group ID | None |
 | TZ | Container timezone | UTC |
 
 ### Volumes
@@ -120,11 +154,18 @@ Logs are written to `/var/log/cron.log` and are automatically rotated every 28 d
 docker logs container-scheduler
 ```
 
+Example: `cron.log`
+
+```log
+[2024-11-28 18:00:00] Restarting hourly containers: alpine
+[2024-11-28 18:00:00] Successfully restarted containers: alpine
+```
+
 ## Security Considerations
 
 This container:
 
-- Runs as a non-root user
+- Executes the script as a non-root user
 - Uses no-new-privileges security option
 - Requires minimal permissions through Docker socket
 
