@@ -117,10 +117,10 @@ services:
 
 ### Environment Variables
 
-| Variable | Description | Default |
+| Variable | Description | Required |
 |----------|-------------|---------|
-| HOST_DOCKER_GID | Docker Group ID | None |
-| TZ | Container timezone | UTC |
+| HOST_DOCKER_GID | Docker Group ID | Yes |
+| TZ | Container timezone (default: UTC) | No |
 
 ### Volumes
 
