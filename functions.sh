@@ -10,17 +10,27 @@ restart_containers() {
 
     containers=$(curl --silent --unix-socket /var/run/docker.sock \
         -X GET "http://localhost/containers/json?filters=${filters}" | \
-        jq -r '.[].Id')
+        jq -r '.[].Names[]' | sed 's|/||') 
 
     if [ -n "$containers" ]; then
-        echo "[${timestamp}] Restarting ${group} containers: ${containers}"
+        echo "[${timestamp}] Stopping ${group} containers: ${containers}"
 
-        for container_id in $containers; do
+        for container_name in $containers; do
             if curl --silent --unix-socket /var/run/docker.sock \
-                -X POST "http://localhost/containers/${container_id}/restart" > /dev/null; then
-                echo "[${timestamp}] Successfully restarted container: ${container_id}"
+                -X POST "http://localhost/containers/${container_name}/stop" > /dev/null; then
+                echo "[${timestamp}] Successfully stopped containers: ${container_name}"
+
+                # Wait a short time to ensure the container has stopped cleanly
+                sleep 1
+
+                if curl --silent --unix-socket /var/run/docker.sock \
+                    -X POST "http://localhost/containers/${container_name}/start" > /dev/null; then
+                    echo "[${timestamp}] Successfully started containers: ${container_name}"
+                else
+                    echo "[${timestamp}] Failed to start containers: ${container_name}" >&2
+                fi
             else
-                echo "[${timestamp}] Failed to restart container: ${container_id}" >&2
+                echo "[${timestamp}] Failed to stop containers: ${container_name}" >&2
             fi
         done
     else

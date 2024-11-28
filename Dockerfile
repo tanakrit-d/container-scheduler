@@ -30,33 +30,32 @@ ARG TARGETARCH
 
 ENV SUPERCRONIC=/usr/local/bin/supercronic
 
+COPY --from=base /usr/local/bin/supercronic /usr/local/bin/supercronic
+COPY container-schedules.cron functions.sh entrypoint.sh /app/
+
 RUN apk add --no-cache \
         bash \
         curl \
         jq \
-        micro \
         procps \
+        shadow \
+        su-exec \
         tzdata && \
     mkdir -p /app /var/log && \
+    addgroup -S docker && adduser -S scheduler -G docker && \
     touch /var/log/cron.log && \
-    rm -rf /var/cache/apk/*
-
-COPY --from=base /usr/local/bin/supercronic /usr/local/bin/supercronic
-COPY functions.sh container-schedules.cron entrypoint.sh /app/
-
-RUN chmod +x /app/entrypoint.sh && \
-    chmod +x /app/functions.sh && \
-    chmod +x /usr/local/bin/supercronic
+    chmod +x /app/entrypoint.sh /app/functions.sh /usr/local/bin/supercronic && \
+    chown -R scheduler:docker /app /var/log /var/log/cron.log
 
 LABEL org.opencontainers.image.title="Scheduler Container" \
-    org.opencontainers.image.description="Scheduling container using supercronic" \
-    org.opencontainers.image.source="https://github.com/tanakrit-d/container-scheduler" \
-    io.container.scheduler.arch="${TARGETARCH}"
+org.opencontainers.image.description="Scheduling container using supercronic" \
+org.opencontainers.image.source="https://github.com/tanakrit-d/container-scheduler" \
+io.container.scheduler.arch="${TARGETARCH}"
 
 WORKDIR /app
 VOLUME ["/var/log"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["sh", "-c", "ps aux | grep supercronic | grep -v grep > /dev/null || exit 1"]
+CMD ["sh", "-c", "ps aux | grep supercronic | grep -v grep > /dev/null || exit 1"]
 
 ENTRYPOINT ["/app/entrypoint.sh"]
