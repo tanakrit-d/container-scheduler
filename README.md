@@ -72,6 +72,7 @@ MacOS (untested):
 services:
   socat:
     image: alpine/socat
+    container_name: socat
     command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
     user: root
     volumes:
@@ -87,7 +88,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /path/to/your/logs:/var/log
     environment:
-      - DOCKER_HOST=localhost:2375
+      - DOCKER_HOST=socat:2375
       - HOST_DOCKER_GID=your-gid-here
       - TZ=Australia/Melbourne
     security_opt:
