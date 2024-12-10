@@ -2,6 +2,8 @@ name: Docker Release Build
 
 on:
   push:
+    branches:
+      - master
     tags: ["v*.*.*"]
   workflow_dispatch:
 
@@ -55,12 +57,9 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=semver,pattern={{version}}
-            type=ref,event=tag,suffix=-amd64,platform=linux/amd64
-            type=ref,event=tag,suffix=-arm64,platform=linux/arm64
-            type=raw,value=latest-amd64,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }},platform=linux/amd64
-            type=raw,value=latest-arm64,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }},platform=linux/arm64
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', github.event.repository.default_branch) }}
             type=sha
-            type=raw,value=latest,enable={{is_default_branch}}
           annotations: |
             org.opencontainers.image.title=${IMAGE_NAME}
             org.opencontainers.image.description=Multi-architecture Docker image
@@ -88,7 +87,7 @@ jobs:
           platforms: ${{ env.PLATFORMS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          provenance: true
+          provenance: false
           sbom: true
 
       - name: Verify manifests
