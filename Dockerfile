@@ -47,9 +47,10 @@ RUN apk add --no-cache \
     chmod +x /app/entrypoint.sh /app/functions.sh /usr/local/bin/supercronic && \
     chown -R scheduler:docker /app /var/log /var/log/cron.log
 
-LABEL org.opencontainers.image.title="Scheduler Container" \
+LABEL org.opencontainers.image.title="Container Scheduler" \
 org.opencontainers.image.description="Scheduling container using supercronic" \
 org.opencontainers.image.source="https://github.com/tanakrit-d/container-scheduler" \
+org.opencontainers.image.version="0.1.4" \
 io.container.scheduler.arch="${TARGETARCH}"
 
 WORKDIR /app
