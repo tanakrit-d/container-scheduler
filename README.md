@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.svg" alt="Docker Container Scheduler Logo" width="200">
+</p>
+
 # Docker Container Scheduler
 
 A lightweight, secure Docker container that automates the scheduling of Docker container restarts based on labels. Built on Alpine Linux and uses [supercronic](https://github.com/aptible/supercronic) for reliable cron job execution.
